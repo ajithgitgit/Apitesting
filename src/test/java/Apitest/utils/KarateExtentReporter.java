@@ -1,11 +1,9 @@
 package Apitest.utils;
 
 import com.intuit.karate.Results;
-import com.intuit.karate.Runner;
 import com.aventstack.extentreports.*;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 
-import java.io.File;
 
 public class KarateExtentReporter {
 
