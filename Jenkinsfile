@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk17'
-        maven 'maven3'
+        // Make sure these match Jenkins → Manage Jenkins → Global Tool Configuration
+        jdk 'jdk17'         // Java name configured in Jenkins
+        maven 'maven3'      // Maven name configured in Jenkins
     }
 
     environment {
@@ -14,7 +15,9 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 echo "⬇️ Checking out repository..."
-                checkout scm
+                git url: 'https://github.com/ajithgitgit/Apitesting.git', branch: 'main'
+                // If private repo:
+                // git url: 'https://github.com/ajithgitgit/Apitesting.git', branch: 'main', credentialsId: 'github-creds'
             }
         }
 
