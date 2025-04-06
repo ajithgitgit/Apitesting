@@ -15,5 +15,3 @@ RUN mkdir -p /app/karate-report
 
 # Copy report files (HTML, surefire, extent, etc.) to report folder
 RUN cp -r target/*.html target/surefire-reports /app/karate-report/
-
-
