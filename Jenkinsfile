@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'karate-reqres-tests'
         REPORT_DIR = 'karate-report'
+        CONTAINER_WORKDIR = '/app'
     }
 
     stages {
@@ -18,7 +19,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "🐳 Building Docker image for Karate tests..."
-                sh "docker build -t ${IMAGE_NAME} ."
+                sh "docker build -t ${env.IMAGE_NAME} ."
             }
         }
 
@@ -26,8 +27,11 @@ pipeline {
             steps {
                 echo "🚀 Running Karate tests inside container..."
                 sh """
-                    mkdir -p ${REPORT_DIR}
-                    docker run --rm -v "\$(pwd)/${REPORT_DIR}:/app/${REPORT_DIR}" ${IMAGE_NAME}
+                    mkdir -p ${env.REPORT_DIR}
+                    docker run --rm \
+                        -v "\${PWD}/${env.REPORT_DIR}:${env.CONTAINER_WORKDIR}/${env.REPORT_DIR}" \
+                        -w "${env.CONTAINER_WORKDIR}" \
+                        ${env.IMAGE_NAME}
                 """
             }
         }
@@ -36,7 +40,7 @@ pipeline {
             steps {
                 echo "📊 Publishing Karate Summary Report..."
                 publishHTML(target: [
-                    reportDir: "${REPORT_DIR}",
+                    reportDir: "${env.REPORT_DIR}",
                     reportFiles: 'karate-summary.html',
                     reportName: 'Karate Summary Report',
                     allowMissing: true,
@@ -50,7 +54,7 @@ pipeline {
             steps {
                 echo "📊 Publishing Extent Report..."
                 publishHTML(target: [
-                    reportDir: "${REPORT_DIR}",
+                    reportDir: "${env.REPORT_DIR}",
                     reportFiles: 'karate-extent-report.html',
                     reportName: 'Extent Report',
                     allowMissing: true,
@@ -63,7 +67,7 @@ pipeline {
         stage('Archive Reports') {
             steps {
                 echo "📦 Archiving test reports..."
-                archiveArtifacts artifacts: "${REPORT_DIR}/**/*.*", fingerprint: true
+                archiveArtifacts artifacts: "${env.REPORT_DIR}/**/*.*", fingerprint: true
             }
         }
     }
