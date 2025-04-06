@@ -1,44 +1,34 @@
 pipeline {
     agent any
 
+    tools {
+        // Ensure Java 17 and Maven are installed via Jenkins Global Tool Configuration
+        jdk 'jdk17'     // This must match the name configured in Jenkins
+        maven 'maven3'  // This must match the name configured in Jenkins
+    }
+
     environment {
-        IMAGE_NAME = 'karate-reqres-tests'
-        REPORT_DIR = 'karate-report'
-        CONTAINER_WORKDIR = '/app'
+        REPORT_DIR = 'target/karate-reports'
     }
 
     stages {
-
         stage('Checkout Code') {
             steps {
-                echo "🔄 Checking out source code..."
+                echo "⬇️ Checking out repository..."
                 checkout scm
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Run Tests') {
             steps {
-                echo "🐳 Building Docker image for Karate tests..."
-                sh "docker build -t ${env.IMAGE_NAME} ."
-            }
-        }
-
-        stage('Run Tests in Docker') {
-            steps {
-                echo "🚀 Running Karate tests inside container..."
-                sh """
-                    mkdir -p ${env.REPORT_DIR}
-                    docker run --rm \
-                        -v "\${PWD}/${env.REPORT_DIR}:${env.CONTAINER_WORKDIR}/${env.REPORT_DIR}" \
-                        -w "${env.CONTAINER_WORKDIR}" \
-                        ${env.IMAGE_NAME}
-                """
+                echo "☕ Setting up Java & Maven environment..."
+                sh 'mvn clean test'
             }
         }
 
         stage('Publish Karate Report') {
             steps {
-                echo "📊 Publishing Karate Summary Report..."
+                echo "📁 Publishing Karate Report..."
                 publishHTML(target: [
                     reportDir: "${env.REPORT_DIR}",
                     reportFiles: 'karate-summary.html',
@@ -50,11 +40,11 @@ pipeline {
             }
         }
 
-        stage('Publish Extent Report') {
+        stage('Publish Extent Report (Optional)') {
             steps {
-                echo "📊 Publishing Extent Report..."
+                echo "📁 Publishing Extent Report..."
                 publishHTML(target: [
-                    reportDir: "${env.REPORT_DIR}",
+                    reportDir: 'target',
                     reportFiles: 'karate-extent-report.html',
                     reportName: 'Extent Report',
                     allowMissing: true,
@@ -64,10 +54,10 @@ pipeline {
             }
         }
 
-        stage('Archive Reports') {
+        stage('Archive All Reports') {
             steps {
-                echo "📦 Archiving test reports..."
-                archiveArtifacts artifacts: "${env.REPORT_DIR}/**/*.*", fingerprint: true
+                echo "📦 Archiving reports..."
+                archiveArtifacts artifacts: 'target/**/*.html', fingerprint: true
             }
         }
     }
