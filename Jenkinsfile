@@ -8,15 +8,13 @@ pipeline {
             }
         }
 
-        stage('Test in Container') {
-            agent {
-                docker {
-                    image 'maven:3.8.8-openjdk-17'  // or whatever image fits your need
-                    args '-v $HOME/.m2:/root/.m2'  // to reuse local Maven cache
-                }
-            }
+        stage('Test in Docker Container') {
             steps {
-                sh 'mvn clean test'
+                script {
+                    docker.image('maven:3.8.8-openjdk-17').inside('-v $HOME/.m2:/root/.m2') {
+                        sh 'mvn clean test'
+                    }
+                }
             }
         }
     }
