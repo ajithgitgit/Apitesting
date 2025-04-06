@@ -18,27 +18,30 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "🐳 Building Docker image for Karate tests..."
-                sh 'docker build -t ${IMAGE_NAME} .'
+                sh "docker build -t ${IMAGE_NAME} ."
             }
         }
 
         stage('Run Tests in Docker') {
             steps {
                 echo "🚀 Running Karate tests inside container..."
-                sh '''
+                sh """
                     mkdir -p ${REPORT_DIR}
-                    docker run --rm -v $(pwd)/${REPORT_DIR}:/app/${REPORT_DIR} ${IMAGE_NAME}
-                '''
+                    docker run --rm -v "\$(pwd)/${REPORT_DIR}:/app/${REPORT_DIR}" ${IMAGE_NAME}
+                """
             }
         }
 
-        stage('Publish Karate Reports') {
+        stage('Publish Karate Report') {
             steps {
-                echo "📊 Publishing Karate Report..."
+                echo "📊 Publishing Karate Summary Report..."
                 publishHTML(target: [
                     reportDir: "${REPORT_DIR}",
                     reportFiles: 'karate-summary.html',
-                    reportName: 'Karate Summary Report'
+                    reportName: 'Karate Summary Report',
+                    allowMissing: true,
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true
                 ])
             }
         }
@@ -49,8 +52,18 @@ pipeline {
                 publishHTML(target: [
                     reportDir: "${REPORT_DIR}",
                     reportFiles: 'karate-extent-report.html',
-                    reportName: 'Extent Report'
+                    reportName: 'Extent Report',
+                    allowMissing: true,
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true
                 ])
+            }
+        }
+
+        stage('Archive Reports') {
+            steps {
+                echo "📦 Archiving test reports..."
+                archiveArtifacts artifacts: "${REPORT_DIR}/**/*.*", fingerprint: true
             }
         }
     }
