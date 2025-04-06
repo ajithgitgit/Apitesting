@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     tools {
-        // Ensure Java 17 and Maven are installed via Jenkins Global Tool Configuration
-        jdk 'jdk17'     // This must match the name configured in Jenkins
-        maven 'maven3'  // This must match the name configured in Jenkins
+        // Ensure these tool names match Jenkins Global Tool Configuration
+        jdk 'jdk17'
+        maven 'maven3'
     }
 
     environment {
@@ -12,6 +12,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 echo "⬇️ Checking out repository..."
@@ -19,16 +20,16 @@ pipeline {
             }
         }
 
-        stage('Build & Run Tests') {
+        stage('Build & Run Karate Tests') {
             steps {
-                echo "☕ Setting up Java & Maven environment..."
+                echo "☕ Building project and running Karate tests..."
                 sh 'mvn clean test'
             }
         }
 
-        stage('Publish Karate Report') {
+        stage('Publish Karate Summary Report') {
             steps {
-                echo "📁 Publishing Karate Report..."
+                echo "📊 Publishing Karate Summary Report..."
                 publishHTML(target: [
                     reportDir: "${env.REPORT_DIR}",
                     reportFiles: 'karate-summary.html',
@@ -40,9 +41,9 @@ pipeline {
             }
         }
 
-        stage('Publish Extent Report (Optional)') {
+        stage('Publish Karate Extent Report') {
             steps {
-                echo "📁 Publishing Extent Report..."
+                echo "📊 Publishing Karate Extent Report..."
                 publishHTML(target: [
                     reportDir: 'target',
                     reportFiles: 'karate-extent-report.html',
@@ -56,7 +57,7 @@ pipeline {
 
         stage('Archive All Reports') {
             steps {
-                echo "📦 Archiving reports..."
+                echo "📦 Archiving all HTML reports..."
                 archiveArtifacts artifacts: 'target/**/*.html', fingerprint: true
             }
         }
@@ -69,4 +70,3 @@ pipeline {
         }
     }
 }
-
