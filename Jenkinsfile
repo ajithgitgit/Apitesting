@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     tools {
-        // Ensure these tool names match Jenkins Global Tool Configuration
         jdk 'jdk17'
         maven 'maven3'
     }
@@ -12,7 +11,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout Code') {
             steps {
                 echo "⬇️ Checking out repository..."
@@ -20,16 +18,16 @@ pipeline {
             }
         }
 
-        stage('Build & Run Karate Tests') {
+        stage('Build & Run Tests') {
             steps {
-                echo "☕ Building project and running Karate tests..."
+                echo "☕ Running tests with Maven..."
                 sh 'mvn clean test'
             }
         }
 
-        stage('Publish Karate Summary Report') {
+        stage('Publish Karate Report') {
             steps {
-                echo "📊 Publishing Karate Summary Report..."
+                echo "📊 Publishing Karate Report..."
                 publishHTML(target: [
                     reportDir: "${env.REPORT_DIR}",
                     reportFiles: 'karate-summary.html',
@@ -41,9 +39,9 @@ pipeline {
             }
         }
 
-        stage('Publish Karate Extent Report') {
+        stage('Publish Extent Report') {
             steps {
-                echo "📊 Publishing Karate Extent Report..."
+                echo "📊 Publishing Extent Report..."
                 publishHTML(target: [
                     reportDir: 'target',
                     reportFiles: 'karate-extent-report.html',
@@ -55,9 +53,9 @@ pipeline {
             }
         }
 
-        stage('Archive All Reports') {
+        stage('Archive Reports') {
             steps {
-                echo "📦 Archiving all HTML reports..."
+                echo "📦 Archiving reports..."
                 archiveArtifacts artifacts: 'target/**/*.html', fingerprint: true
             }
         }
@@ -65,7 +63,7 @@ pipeline {
 
     post {
         always {
-            echo "🧹 Cleaning up workspace..."
+            echo "🧹 Cleaning workspace..."
             deleteDir()
         }
     }
