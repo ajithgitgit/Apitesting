@@ -14,12 +14,10 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                echo "⬇️ Checking out repository..."
                 git url: 'https://github.com/ajithgitgit/Apitesting.git', branch: 'main'
-                // If private repo:
-                // git url: 'https://github.com/ajithgitgit/Apitesting.git', branch: 'main', credentialsId: 'github-creds'
             }
         }
+
 
         stage('Build & Run Tests') {
             steps {
