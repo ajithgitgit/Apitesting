@@ -11,36 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: ⬇️ Checkout Repository
-      uses: actions/checkout@v3
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: ☕ Setup Java
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: 📦 Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+      - name: 📦 Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-    - name: 🛠️ Build with Maven & Run Tests
-      run: mvn clean test
+      - name: 🛠️ Build with Maven & Run Tests
+        run: mvn clean test
 
-    - name: 📁 Upload Karate Reports
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: karate-reports
-        path: target/karate-reports/
+      - name: 📁 Upload Karate Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: karate-reports
+          path: target/karate-reports/
 
-    - name: 📁 Upload Extent Reports (optional)
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: extent-reports
-        path: target/*.html
+      - name: 📁 Upload Extent Reports (optional)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-reports
+          path: target/*.html
