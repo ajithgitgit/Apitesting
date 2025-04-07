@@ -1,7 +1,8 @@
 Feature: Adactin Hotel App Login
 
   Background:
-    * configure driver = { type: 'chromedriver', headless: true }
+ * karate.configure('driver', { type: 'geckodriver', headless: true });
+
 
   Scenario: Successful login to Adactin
     Given driver 'http://adactinhotelapp.com/'

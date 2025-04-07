@@ -28,35 +28,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: 🧰 Install JQ (for parsing JSON)
-        run: sudo apt install jq -y
-
-      - name: 🧩 Install Chrome & Matching ChromeDriver
+      - name: 🔧 Install Firefox (just to be sure it's latest)
         run: |
           sudo apt-get update
-          sudo apt-get install -y unzip xvfb wget curl
+          sudo apt-get install -y firefox
 
-          # Install Chrome
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get -f install -y
-
-          # Get Chrome version & major version
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
-          CHROME_MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d '.' -f 1)
-
-          echo "Installed Chrome version: $CHROME_VERSION"
-
-          # Get matching ChromeDriver version
-          DRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" | jq -r ".channels.Stable.versions[] | select(.version | startswith(\"$CHROME_MAJOR_VERSION\")) | .version" | head -n 1)
-          DRIVER_URL=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" | jq -r ".channels.Stable.versions[] | select(.version == \"$DRIVER_VERSION\") | .downloads.chromedriver[] | select(.platform == \"linux64\") | .url")
-          
-          echo "Downloading ChromeDriver version: $DRIVER_VERSION"
-          wget -q "$DRIVER_URL" -O chromedriver-linux64.zip
-          unzip chromedriver-linux64.zip
-          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
-          sudo chmod +x /usr/local/bin/chromedriver
-
-      - name: 🛠️ Build with Maven & Run Tests
+      - name: 🛠️ Run Tests with Maven
         run: xvfb-run mvn clean test
 
       - name: 📁 Upload Karate Reports
