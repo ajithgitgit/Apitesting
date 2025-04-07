@@ -38,3 +38,5 @@ jobs:
 
       - name: Run Karate UI Tests
         run: xvfb-run mvn test -Dtest=YourUITestRunnerClassName
+
+
