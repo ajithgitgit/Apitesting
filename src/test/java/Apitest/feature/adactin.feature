@@ -1,7 +1,7 @@
 Feature: Adactin Hotel App Login
 
   Background:
-    * configure driver = { type: 'chrome' }
+    * configure driver = { type: 'chromedriver', headless: true }
 
   Scenario: Successful login to Adactin
     Given driver 'http://adactinhotelapp.com/'
