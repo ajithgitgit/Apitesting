@@ -28,8 +28,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: 🛠️ Build with Maven & Run Tests
-        run: mvn clean test
+      - name: 🔧 Install Firefox (just to be sure it's latest)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+
+      - name: 🛠️ Run Tests with Maven
+        run: xvfb-run mvn clean test
 
       - name: 📁 Upload Karate Reports
         if: always()
